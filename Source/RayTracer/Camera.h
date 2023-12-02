@@ -4,7 +4,7 @@
 
 class Camera {
 public:
-	Camera(const glm::vec3& eye, const glm::vec3& up, float fov, float aspectRatio);
+	Camera(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up, float fov, float aspectRatio);
 
 	void LookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up);
 	ray_t GetRay(const glm::vec2& point) const;
