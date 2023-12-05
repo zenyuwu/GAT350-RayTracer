@@ -20,17 +20,25 @@ int main(int argc, char* argv[])
     float aspectRatio = (canvas.GetSize().x / (float)canvas.GetSize().y);
 
     std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec3{ 0, 0, 1 }, glm::vec3{ 0, 0, 0 }, glm::vec3{ 0, 1, 0 }, 70.0f, aspectRatio);
-    Scene scene;
+    Scene scene(20);
     scene.SetCamera(camera);
     
      //create material
-    auto material = std::make_shared<Lambertian>(color3_t{ 0, 0, 1 });
+    auto lambertian = std::make_shared<Lambertian>(color3_t{ 1, 0, 0 });
+    auto metal = std::make_shared<Metal>(color3_t{ 1,0,1 }, 0.0f);
+
     for (int i = 0; i < 20; i++) {
+        std::shared_ptr<Material> material = (random01() < 0.5f) ? std::dynamic_pointer_cast<Material>(lambertian) : std::dynamic_pointer_cast<Material>(metal);
         auto sphere = std::make_unique<Sphere>(random(glm::vec3{-10,-10,-10}, glm::vec3{8,8,-1}), 1, material);
         scene.AddObject(std::move(sphere));
     }
-    //auto sphere = std::make_unique<Sphere>(glm::vec3{ 0,0,-1 }, 1, material);
-    //scene.AddObject(std::move(sphere));
+
+    bool isOld = false;
+    if (!isOld) {
+        canvas.Clear({ 0,0,0,1 });
+        scene.Render(canvas,50);
+        canvas.Update();
+    }
 
     bool quit = false;
     while (!quit) {
@@ -49,14 +57,12 @@ int main(int argc, char* argv[])
                 }
                 break;
         }
+        if (isOld) {
+            canvas.Clear({ 0,0,0,1 });
+            scene.Render(canvas);
+            canvas.Update();
+        }
         
-        canvas.Clear({ 0,0,0,1 });
-       /* for (int i = 0; i < 1000; i++) {
-            canvas.DrawPoint({ random01() * canvas.GetSize().x, random01() * canvas.GetSize().y}, {random01(), random01(), random01(), 1});
-        }*/
-        scene.Render(canvas);
-        canvas.Update();
-
         renderer.PresentCanvas(canvas);
     }
     renderer.Shutdown();
